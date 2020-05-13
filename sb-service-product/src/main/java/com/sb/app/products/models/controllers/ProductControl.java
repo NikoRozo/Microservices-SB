@@ -39,6 +39,14 @@ public class ProductControl {
 		Product product = preductService.fineById(id);
 		//product.setPort(Integer.parseInt(env.getProperty("server.port")));
 		product.setPort(port);
+		
+		/*try {
+			Thread.sleep(2000L);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+		
 		return product;
 	}
 }
