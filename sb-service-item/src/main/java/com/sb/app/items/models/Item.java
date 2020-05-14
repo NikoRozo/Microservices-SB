@@ -1,5 +1,7 @@
 package com.sb.app.items.models;
 
+import com.sb.app.commons.models.entity.Product;
+
 public class Item {
 
 	private Product product;

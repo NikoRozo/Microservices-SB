@@ -21,10 +21,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.sb.app.items.models.Item;
-import com.sb.app.items.models.Product;
+import com.sb.app.commons.models.entity.Product;
 import com.sb.app.items.models.services.IItemService;
 
 @RefreshScope

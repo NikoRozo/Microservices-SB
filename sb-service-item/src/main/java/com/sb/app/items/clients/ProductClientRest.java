@@ -8,8 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
-import com.sb.app.items.models.Product;
+import com.sb.app.commons.models.entity.Product;
 
 @FeignClient(name = "service.products")
 public interface ProductClientRest {
