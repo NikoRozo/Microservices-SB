@@ -8,4 +8,8 @@ public interface IProductService {
 	public List<Product> fineAll();
 
 	public Product fineById(Long Id);
+	
+	public Product save(Product product);
+	
+	public void deleteById(Long id);
 }
