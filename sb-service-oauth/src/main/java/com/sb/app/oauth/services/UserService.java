@@ -17,40 +17,41 @@ import com.sb.app.oauth.client.UserFeignClient;
 
 @Service
 public class UserService implements UserDetailsService, IUserService {
-	
+
 	private Logger log = LoggerFactory.getLogger(UserService.class);
 
 	@Autowired
 	private UserFeignClient client;
-	
+
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		User user = client.findByUsername(username);
-		
-		if (user == null) {
+		try {
+
+			User user = client.findByUsername(username);
+
+			List<GrantedAuthority> authorities = user.getRoles().stream()
+					.map(role -> new SimpleGrantedAuthority(role.getNombre()))
+					.peek(autority -> log.info("Role: " + autority.getAuthority())).collect(Collectors.toList());
+
+			log.info("Usuario Autenticado: " + username);
+
+			return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
+					user.getEnabled(), true, true, true, authorities);
+		} catch (Exception e) {
 			log.error("Error en el login, No existe el usuario '" + username + "' en el sistema.");
-			throw new UsernameNotFoundException("Error en el login, No existe el usuario '" + username + "' en el sistema.");
+			throw new UsernameNotFoundException(
+					"Error en el login, No existe el usuario '" + username + "' en el sistema.");
 		}
-		
-		List<GrantedAuthority> authorities = user.getRoles()
-				.stream()
-				.map(role -> new SimpleGrantedAuthority(role.getNombre()))
-				.peek(autority -> log.info("Role: " + autority.getAuthority()))
-				.collect(Collectors.toList());
-		
-		log.info("Usuario Autenticado: " + username);
-		
-		return new org.springframework.security.core.userdetails.User(
-				user.getUsername(), 
-				user.getPassword(), 
-				user.getEnabled(), 
-				true, true, true, 
-				authorities);
 	}
 
 	@Override
 	public User findByUsername(String username) {
 		return client.findByUsername(username);
+	}
+
+	@Override
+	public User update(User user, Long id) {
+		return client.update(user, id);
 	}
 
 }

@@ -32,8 +32,10 @@ public class User implements Serializable {
 	@Column(unique = true, length = 100)
 	private String email;
 
+	private Integer intentos;
+
 	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(uniqueConstraints = {@UniqueConstraint(columnNames = {"users_id", "roles_id"})})
+	@JoinTable(uniqueConstraints = { @UniqueConstraint(columnNames = { "users_id", "roles_id" }) })
 	private List<Rol> roles;
 
 	public Long getId() {
@@ -90,6 +92,14 @@ public class User implements Serializable {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public Integer getIntentos() {
+		return intentos;
+	}
+
+	public void setIntentos(Integer intentos) {
+		this.intentos = intentos;
 	}
 
 	public List<Rol> getRoles() {
