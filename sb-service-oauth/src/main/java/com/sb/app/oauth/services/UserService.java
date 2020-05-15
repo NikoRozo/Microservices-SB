@@ -16,7 +16,7 @@ import com.sb.app.commons.users.models.entity.User;
 import com.sb.app.oauth.client.UserFeignClient;
 
 @Service
-public class UserService implements UserDetailsService {
+public class UserService implements UserDetailsService, IUserService {
 	
 	private Logger log = LoggerFactory.getLogger(UserService.class);
 
@@ -41,11 +41,16 @@ public class UserService implements UserDetailsService {
 		log.info("Usuario Autenticado: " + username);
 		
 		return new org.springframework.security.core.userdetails.User(
-				user.getNombre(), 
+				user.getUsername(), 
 				user.getPassword(), 
 				user.getEnabled(), 
 				true, true, true, 
 				authorities);
+	}
+
+	@Override
+	public User findByUsername(String username) {
+		return client.findByUsername(username);
 	}
 
 }
