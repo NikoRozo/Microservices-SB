@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import com.sb.app.commons.users.models.entity.User;
 import com.sb.app.oauth.services.IUserService;
 
+import brave.Tracer;
 import feign.FeignException;
 
 @Component
@@ -21,6 +22,9 @@ public class AuthenticationSuccessErrorHandler implements AuthenticationEventPub
 
 	@Autowired
 	private IUserService userService;
+	
+	@Autowired
+	private Tracer tracer;
 
 	@Override
 	public void publishAuthenticationSuccess(Authentication authentication) {
@@ -35,6 +39,12 @@ public class AuthenticationSuccessErrorHandler implements AuthenticationEventPub
 		System.out.println("Error en el Login: " + exception.getMessage());
 
 		try {
+			StringBuilder errors = new StringBuilder();
+			
+			errors.append("Error en el Login: " + exception.getMessage());
+			
+			tracer.currentSpan().tag("error.mensaje", errors.toString());
+			
 			User user = userService.findByUsername(authentication.getName());
 			if (user.getIntentos() == null) {
 				user.setIntentos(0);
@@ -43,6 +53,7 @@ public class AuthenticationSuccessErrorHandler implements AuthenticationEventPub
 			
 			if (user.getIntentos() >= 3) {
 				log.error(String.format("El User %s des-habilitado por maximo de intentos", authentication.getName()));
+								
 				user.setEnabled(false);
 			}
 			
