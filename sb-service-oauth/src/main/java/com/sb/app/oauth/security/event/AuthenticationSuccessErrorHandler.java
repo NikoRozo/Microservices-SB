@@ -29,37 +29,54 @@ public class AuthenticationSuccessErrorHandler implements AuthenticationEventPub
 	@Override
 	public void publishAuthenticationSuccess(Authentication authentication) {
 		UserDetails user = (UserDetails) authentication.getPrincipal();
-		System.out.println("Success Login: " + user.getUsername());
-		log.info("Success Login: " + user.getUsername());
+		
+		String mensaje = "Success Login: " + user.getUsername();
+		System.out.println(mensaje);
+		log.info(mensaje);
+		
+		User usuario = userService.findByUsername(authentication.getName());
+		
+		if(usuario.getIntentos() != null && usuario.getIntentos() > 0) {
+			usuario.setIntentos(0);
+			userService.update(usuario, usuario.getId());
+		}
 	}
 
 	@Override
 	public void publishAuthenticationFailure(AuthenticationException exception, Authentication authentication) {
-		log.error("Error en el Login: " + exception.getMessage());
-		System.out.println("Error en el Login: " + exception.getMessage());
+		String mensaje = "Error en el Login: " + exception.getMessage();
+		
+		log.error(mensaje);
+		System.out.println(mensaje);
 
 		try {
 			StringBuilder errors = new StringBuilder();
-			
-			errors.append("Error en el Login: " + exception.getMessage());
-			
-			tracer.currentSpan().tag("error.mensaje", errors.toString());
-			
+			errors.append(mensaje);
+						
 			User user = userService.findByUsername(authentication.getName());
 			if (user.getIntentos() == null) {
 				user.setIntentos(0);
 			}
+			
 			user.setIntentos(user.getIntentos() + 1);
 			
+			errors.append(" - Intentos del login: " + user.getIntentos());
+			
 			if (user.getIntentos() >= 3) {
-				log.error(String.format("El User %s des-habilitado por maximo de intentos", authentication.getName()));
+				String errorMaxIntentos = String.format("El usuario %s des-habilitado por máximos intentos.", user.getUsername());
+				log.error(errorMaxIntentos);
+				errors.append(" - " + errorMaxIntentos);
 								
 				user.setEnabled(false);
 			}
 			
 			userService.update(user, user.getId());
+			
+			tracer.currentSpan().tag("error.mensaje", errors.toString());
+			
 		} catch (FeignException e) {
 			log.error(String.format("El User %s no existe en el sistema", authentication.getName()));
+			tracer.currentSpan().tag("error.mensaje", String.format("El User %s no existe en el sistema", authentication.getName()));
 		}
 	}
 

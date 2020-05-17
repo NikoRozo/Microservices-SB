@@ -43,12 +43,11 @@ public class UserService implements UserDetailsService, IUserService {
 			return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
 					user.getEnabled(), true, true, true, authorities);
 		} catch (Exception e) {
-			log.error("Error en el login, No existe el usuario '" + username + "' en el sistema.");
+			String error = "Error en el login, no existe el usuario '" + username + "' en el sistema";
+			log.error(error);
 			
-			tracer.currentSpan().tag("error.mensaje", "Error en el login, No existe el usuario '" + username + "' en el sistema." + " : " + e.getMessage());
-			
-			throw new UsernameNotFoundException(
-					"Error en el login, No existe el usuario '" + username + "' en el sistema.");
+			tracer.currentSpan().tag("error.mensaje", error + ": " + e.getMessage());
+			throw new UsernameNotFoundException(error);
 		}
 	}
 

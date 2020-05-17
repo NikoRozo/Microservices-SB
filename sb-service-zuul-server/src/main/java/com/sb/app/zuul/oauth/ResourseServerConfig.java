@@ -1,9 +1,6 @@
 package com.sb.app.zuul.oauth;
 
 import java.util.Arrays;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
