@@ -1,5 +1,8 @@
-# Entrar a la consola del cpntenedor
+# Entrar a la consola del contenedor
 docker exec -it <mycontainer> bash
+
+# Logs
+docker logs -f <mycontainer>
 
 # Network
 docker network create springcloud
@@ -31,7 +34,7 @@ docker run -P --name service-products --network springcloud -d service-products:
 # Service Items
 .\mvnw clean package -DskipTests
 docker build -t service-items:v1 .
-docker run -P --name service-items --network springcloud -d service-items:v1
+docker run -p 8002:8002 -p 8005:8005 -p 8007:8007 --name service-items --network springcloud -d service-items:v1
 
 # Service Users
 .\mvnw clean package -DskipTests
@@ -47,3 +50,11 @@ docker run -p 9100:9100 --name service-oauth --network springcloud -d service-oa
 .\mvnw clean package -DskipTests
 docker build -t zuul-server:v1 .
 docker run -p 8090:8090 --name zuul-server --network springcloud -d zuul-server:v1
+
+# RabbitMQ
+docker pull rabbitmq:3.8-management-alpine
+docker run -p 15672:15672 -P 5672:5672 --name sb-rabbitmq --network springcloud -d rabbitmq:3.8-management-alpine
+
+# Server Zipkin
+docker build -t server-zipkin:v1 .
+docker run -p 9411:9411 --name server-zipkin --network springcloud -d server-zipkin:v1
