@@ -1,0 +1,25 @@
+# Network
+docker network create springcloud
+
+# Config Server
+.\mvnw clean package
+docker build -t config-server:v1 .
+docker run -p 8888:8888 --name config-server --network springcloud -d config-server:v1
+
+# Eureka Server
+.\mvnw clean package
+docker build -t eureka-server:v1 .
+docker run -p 8761:8761 --name eureka-server --network springcloud -d eureka-server:v1
+
+# MYSQL
+docker pull mysql:8
+docker run -p 3306:3306 --name db-mysql8 --network springcloud -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=db_sb_cloud -d mysql:8
+
+# PostgreSQL
+docker pull postgres:12-alpine
+docker run -p 5432:5432 --name db-postgres12 --network springcloud -e POSTGRES_PASSWORD=root -e POSTGRES_DB=db_sb_cloud -d postgres:12-alpine
+
+# Service Product
+.\mvnw clean package -DskipTests
+docker build -t service-products:v1 .
+docker run -P --name service-products --network springcloud -d service-products:v1
