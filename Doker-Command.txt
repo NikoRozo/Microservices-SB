@@ -1,5 +1,9 @@
+# Entrar a la consola del cpntenedor
+docker exec -it <mycontainer> bash
+
 # Network
 docker network create springcloud
+docker network inspect springcloud
 
 # Config Server
 .\mvnw clean package
@@ -19,7 +23,27 @@ docker run -p 3306:3306 --name db-mysql8 --network springcloud -e MYSQL_ROOT_PAS
 docker pull postgres:12-alpine
 docker run -p 5432:5432 --name db-postgres12 --network springcloud -e POSTGRES_PASSWORD=root -e POSTGRES_DB=db_sb_cloud -d postgres:12-alpine
 
-# Service Product
+# Service Products
 .\mvnw clean package -DskipTests
 docker build -t service-products:v1 .
 docker run -P --name service-products --network springcloud -d service-products:v1
+
+# Service Items
+.\mvnw clean package -DskipTests
+docker build -t service-items:v1 .
+docker run -P --name service-items --network springcloud -d service-items:v1
+
+# Service Users
+.\mvnw clean package -DskipTests
+docker build -t service-users:v1 .
+docker run -P --name service-users --network springcloud -d service-users:v1
+
+# Service OAuth
+.\mvnw clean package -DskipTests
+docker build -t service-oauth:v1 .
+docker run -p 9100:9100 --name service-oauth --network springcloud -d service-oauth:v1
+
+# Service Zuul
+.\mvnw clean package -DskipTests
+docker build -t zuul-server:v1 .
+docker run -p 8090:8090 --name zuul-server --network springcloud -d zuul-server:v1
