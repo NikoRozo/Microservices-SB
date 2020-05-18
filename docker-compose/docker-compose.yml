@@ -24,6 +24,16 @@ services:
         environment: 
             MYSQL_DATABASE: db_sb_cloud
             MYSQL_ROOT_PASSWORD: root
+    db-postgres12:
+        image: postgres:12-alpine
+        ports:
+            - "5432:5432"
+        restart: always
+        networks:
+            - springcloud
+        environment: 
+            POSTGRES_DB: db_sb_cloud
+            POSTGRES_PASSWORD: root
     service-products:
         image: service-products:v1
         restart: always
@@ -46,6 +56,26 @@ services:
             - config-server
             - eureka-server
             - service-products
+    service-users:
+        image: service-users:v1
+        restart: always
+        networks:
+            - springcloud
+        depends_on: 
+            - config-server
+            - eureka-server
+            - db-postgres12
+    service-oauth:
+        image: service-oauth:v1
+        ports:
+            - "9100:9100"
+        restart: always
+        networks:
+            - springcloud
+        depends_on: 
+            - config-server
+            - servicio-eureka-server
+            - service-users
     zuul-server:
         image: zuul-server:v1
         ports: 
@@ -58,5 +88,31 @@ services:
             - eureka-server
             - service-products
             - service-items
+            - service-users
+            - service-oauth
+    sb-rabbitmq:
+        image: rabbitmq:3.8-management-alpine
+        ports:
+            - "15672:15672"
+            - "5672:5672"
+        restart: always
+        networks:
+            - springcloud
+    zipkin-server:
+        image: zipkin-server:v1
+        ports:
+            - "9411:9411"
+        restart: always
+        networks:
+            - springcloud
+        depends_on: 
+            - sb-rabbitmq
+            - db-mysql8
+        environment: 
+            RABBIT_ADDRESSES: sb-rabbitmq:5672
+            STORAGE_TYPE: mysql
+            MYSQL_USER: zipkin
+            MYSQL_PASS: zipkin
+            MYSQL_HOST: db-mysql8
 networks: 
     springcloud
