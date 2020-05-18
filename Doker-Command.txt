@@ -58,3 +58,18 @@ docker run -p 15672:15672 -P 5672:5672 --name sb-rabbitmq --network springcloud 
 # Server Zipkin
 docker build -t server-zipkin:v1 .
 docker run -p 9411:9411 --name server-zipkin --network springcloud -e RABBIT_ADDRESSES=sb-rabbitmq:5672 -e STORAGE_TYPE=mysql -e MYSQL_USER=zipkin -e MYSQL_PASS=zipkin -e MYSQL_HOST=db-mysql8 -d server-zipkin:v1
+
+# Detener todo
+docker stop ${docker pd -q}
+
+# Docker Compose up (debe estar en el directorio de docker-compose.yml)
+docker-compose up -d
+
+# Cuando hay dependencias, se recomienda inicializar los servicios por aparte
+docker-compose up -d <service_name>
+
+# Docker Compose down (debe estar en el directorio de docker-compose.yml)
+docker-compose down -v
+
+# Docker Compose log
+docker-compose logs -f
